@@ -14,6 +14,7 @@ class Menu extends Phaser.Scene {
             startFrame: 0,
             endFrame: 9
         })
+        this.load.image('spark', './assets/spark.png')
         // load audio
         this.load.audio('sfx-select', './assets/sfx-select.wav')
         this.load.audio('sfx-explosion1', './assets/sfx-explosion1.wav')

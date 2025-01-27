@@ -8,6 +8,7 @@ class Play extends Phaser.Scene {
 
          //place tile sprite
         this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0)
+        this.starfield.setInteractive()
 
         //green UI background
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0,0)
@@ -60,10 +61,34 @@ class Play extends Phaser.Scene {
             this.gameOver = true
         }, null, this)
         // display
-        this.timerdisplay = this.add.text(this.game.config.width/2 - 36, borderUISize + borderPadding*2, '', {
+        this.timerdisplay = this.add.text(game.config.width/2 - 36, borderUISize + borderPadding*2, '', {
             fontFamily: 'Courier',
             fontSize: '48px',
-            color: '#FFFFFF',
+            color: '#FFFFFF'
+        })
+        this.mousemode = this.add.text(game.config.width/2 - 196, game.config.height - borderPadding*2, '', {
+            fontFamily: 'Courier',
+            fontSize: '16px',
+            color: '#000000'
+        })
+
+        this.input.on("pointerdown", (pointer) => {
+            if (pointer.isDown && !this.p1Rocket.isFiring && this.inframe) {
+                this.p1Rocket.x = pointer.x
+                this.p1Rocket.isFiring = true
+                this.p1Rocket.sfxShot.play()
+            }
+        })
+        this.starfield.on("pointerover", () => {
+            this.inframe = true
+            console.log('pointer in frame')
+            this.mousemode.text = '( CLICK OFF WINDOW TO EXIT MOUSE CONTROLS )'
+
+        })
+        this.starfield.on("pointerout", () => {
+            this.inframe = false
+            console.log('pointer out of frame')
+            this.mousemode.text = ''
         })
     }
 
@@ -77,7 +102,7 @@ class Play extends Phaser.Scene {
         }
 
         this.starfield.tilePositionX -= 4
-        if(!this.gameOver) {
+        if (!this.gameOver) {
             this.p1Rocket.update()
             this.ship01.update()
             this.ship02.update()
@@ -87,6 +112,13 @@ class Play extends Phaser.Scene {
             let countdown = (game.settings.gameTimer/1000) - Math.round(this.clock.getElapsed()/1000)
             this.timerdisplay.text = countdown
         }
+
+        if (!this.p1Rocket.isFiring && this.inframe 
+            && this.input.x >= borderUISize
+            && this.input.x <= game.config.width - borderUISize) {
+            this.p1Rocket.x = this.input.x
+        }
+
         // check collisions
         if (this.checkCollision(this.p1Rocket, this.ship04)) {
             this.shipExplode(this.ship04)
