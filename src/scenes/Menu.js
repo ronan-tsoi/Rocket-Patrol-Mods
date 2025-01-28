@@ -15,6 +15,8 @@ class Menu extends Phaser.Scene {
             endFrame: 9
         })
         this.load.image('spark', './assets/spark.png')
+        this.load.image('title', './assets/title.png')
+        this.load.image('pts', './assets/pts.png')
         // load audio
         this.load.audio('sfx-select', './assets/sfx-select.wav')
         this.load.audio('sfx-explosion1', './assets/sfx-explosion1.wav')
@@ -48,12 +50,21 @@ class Menu extends Phaser.Scene {
             fixedWitdh: 0
         }
         // display menu text
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'ROCKET PATROL', menuConfig).setOrigin(0.5)
-        this.add.text(game.config.width/2, game.config.height/2, 'Use ← → arrows to move & (F) to fire', menuConfig).setOrigin(0.5)
-        menuConfig.backgroundColor = '#00FF00'
-        menuConfig.color = '#000'
-        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding, 'Press ← for Novice or → for Expert', menuConfig).setOrigin(0.5)
+        //this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'ROCKET PATROL', menuConfig).setOrigin(0.5)
+        this.add.image(game.config.width/2, borderUISize + borderPadding*8, 'title').setScale(3)
+        this.add.text(game.config.width/2, game.config.height/2 + borderPadding, 'Use ← → arrows or mouse to move', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, game.config.height/2 + borderPadding*4, '(F) or Left Click to fire', menuConfig).setOrigin(0.5)
+        //menuConfig.backgroundColor = '#00FF00'
+        //menuConfig.color = '#000'
+        menuConfig.backgroundColor = '#000000'
+        menuConfig.color = '#FFFFFF'
+        this.add.image(game.config.width/2, borderUISize + borderPadding*29, 'pts').setScale(2)
+        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + (borderPadding*10), '← for Novice or → for Expert', menuConfig).setOrigin(0.5)
         
+        this.add.image(game.config.width/2, game.config.height - borderPadding*4, 'spaceship')
+        this.add.image(game.config.width/2 - borderPadding*8, game.config.height - borderPadding*4, 'spaceship2')
+        this.add.image(game.config.width/2 + borderPadding*8, game.config.height - borderPadding*4, 'spaceship2')
+
         // define keys
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
@@ -73,7 +84,7 @@ class Menu extends Phaser.Scene {
             //hard mode
             game.settings = {
                 spaceshipSpeed: 4,
-                gameTimer: 5000
+                gameTimer: 45000
             }
             this.sound.play('sfx-select')
             this.scene.start('playScene')

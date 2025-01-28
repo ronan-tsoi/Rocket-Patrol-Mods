@@ -49,6 +49,7 @@ class Play extends Phaser.Scene {
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig)
         this.fire = this.add.text(this.game.config.width - borderUISize - borderPadding*8, borderUISize + borderPadding*2, 'FIRE', scoreConfig)
+        this.record = this.add.text(borderUISize + borderPadding*8, borderUISize + borderPadding*2, 'HS:' + highScore, scoreConfig)
         
         // game over flag
         this.gameOver = false
@@ -73,7 +74,7 @@ class Play extends Phaser.Scene {
         })
 
         this.input.on("pointerdown", (pointer) => {
-            if (pointer.isDown && !this.p1Rocket.isFiring && this.inframe) {
+            if (pointer.isDown && !this.p1Rocket.isFiring && this.inframe && !this.gameOver) {
                 this.p1Rocket.x = pointer.x
                 this.p1Rocket.isFiring = true
                 this.p1Rocket.sfxShot.play()
@@ -81,27 +82,35 @@ class Play extends Phaser.Scene {
         })
         this.starfield.on("pointerover", () => {
             this.inframe = true
-            console.log('pointer in frame')
+            //console.log('pointer in frame')
             this.mousemode.text = '( CLICK OFF WINDOW TO EXIT MOUSE CONTROLS )'
 
         })
         this.starfield.on("pointerout", () => {
             this.inframe = false
-            console.log('pointer out of frame')
+            //console.log('pointer out of frame')
             this.mousemode.text = ''
         })
+
+        this.starfieldVelocity = 4
     }
 
     update() {
         // check key input for restart
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
+            if (this.p1Score > highScore) {
+                highScore = this.p1Score
+            }
         }
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.scene.start("menuScene")
+            if (this.p1Score > highScore) {
+                highScore = this.p1Score
+            }
         }
 
-        this.starfield.tilePositionX -= 4
+        this.starfield.tilePositionX -= this.starfieldVelocity
         if (!this.gameOver) {
             this.p1Rocket.update()
             this.ship01.update()
@@ -111,12 +120,22 @@ class Play extends Phaser.Scene {
             
             let countdown = (game.settings.gameTimer/1000) - Math.round(this.clock.getElapsed()/1000)
             this.timerdisplay.text = countdown
+            
+            if (!this.p1Rocket.isFiring && this.inframe 
+                && this.input.x >= borderUISize
+                && this.input.x <= game.config.width - borderUISize) {
+                this.p1Rocket.x = this.input.x
+            }
         }
 
-        if (!this.p1Rocket.isFiring && this.inframe 
-            && this.input.x >= borderUISize
-            && this.input.x <= game.config.width - borderUISize) {
-            this.p1Rocket.x = this.input.x
+        if (Math.round(this.clock.getElapsed()/1000) == 30) {
+            console.log('increasing speed')
+            this.ship01.moveSpeed *= 1.009
+            this.ship02.moveSpeed *= 1.009
+            this.ship03.moveSpeed *= 1.009
+            this.ship04.moveSpeed *= 1.009
+            this.starfieldVelocity *= 1.007
+
         }
 
         // check collisions
